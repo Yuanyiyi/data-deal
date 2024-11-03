@@ -1,0 +1,4 @@
+PyYAML 6.0.2
+clickhouse_driver 0.2.9
+pandas 2.2.3
+numpy 2.1.2
