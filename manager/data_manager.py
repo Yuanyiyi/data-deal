@@ -72,7 +72,7 @@ class DataManager:
         date_str = current_date.strftime('%Y-%m-%d')
 
         data = self.concat_data(last_day_midnight_timestamp, today_midnight_timestamp)
-        self.__test2.insert_batch(date_str, data)
+        self.__test2.insert_dataframe(date_str, data)
 
     def handle_history_data(self):
         # 重新生成每6个月间隔的时间点列表
@@ -88,14 +88,14 @@ class DataManager:
         start_time1 = six_month_timestamps[0]
         for end_time1 in six_month_timestamps[1:]:
             data = self.concat_data(start_time1, end_time1)
-            self.__test2.insert_batch(f"start_time: {datetime.fromtimestamp(start_time1)}, "
+            self.__test2.insert_dataframe(f"start_time: {datetime.fromtimestamp(start_time1)}, "
                                        f"end_time: {datetime.fromtimestamp(end_time1)}", data)
             # 将上一轮的结束时间作为下一路开始时间
             start_time1 = end_time1
 
         # 从上一轮时间到当前时间的计算
         data = self.concat_data(start_time1, end_time)
-        self.__test2.insert_batch(f"start_time: {datetime.fromtimestamp(start_time1)}, "
+        self.__test2.insert_dataframe(f"start_time: {datetime.fromtimestamp(start_time1)}, "
                                    f"end_time: {datetime.fromtimestamp(end_time)}", data)
 
     def exec(self):

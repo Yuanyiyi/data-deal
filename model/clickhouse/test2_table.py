@@ -41,20 +41,32 @@ class Test2CK:
         try:
             # 定义每批次插入的行数
             batch_size = 1000
+            query = self.get_insert_sql(df)
             # 分批次插入数据
             for start in range(0, len(df), batch_size):
                 end = min(start + batch_size, len(df))
-                sql = self.get_insert_sql(df[start:end])
+                tuples = [tuple(x) for x in df[start:end].to_numpy()]
+                sql = f"{query}" + ', '.join(map(str, tuples))
                 self.__ck.insert(sql)
             logger.info(f"insert month: {month} data success")
         except Exception as e:
             logger.error(f"insert_batch from table: {self.__table}, sql: {sql} error: {e}")
 
-    def get_insert_sql(self, df: pd.DataFrame)->str:
-        # 批量插入数据sql语句
+    def insert_dataframe(self, month: str, df: pd.DataFrame):
+        if df is None or len(df) < 1:
+            return
+        try:
+            # 定义每批次插入的行数
+            batch_size = 1000
+            cols = df.columns.tolist()
+            query = f"INSERT INTO {self.__table} ({','.join(map(str, cols))}) VALUES "
+            self.__ck.insert_dataframe(query, df, settings={'max_insert_block_size': batch_size})
+            logger.info(f"insert month: {month} data success")
+        except Exception as e:
+            logger.error(f"insert_batch from table: {self.__table}, sql: {query} error: {e}")
+
+    def get_insert_sql(self, df: pd.DataFrame) -> str:
         cols = df.columns.tolist()
         query = f"INSERT INTO {self.__table} ({','.join(map(str, cols))}) VALUES "
-        tuples = [tuple(x) for x in df.to_numpy()]
-        sql = f"{query}" + ', '.join(map(str, tuples))
-        logger.debug(f"get_insert_sql: {sql}")
-        return sql
+        logger.debug(f"get_insert_sql: {query}")
+        return query

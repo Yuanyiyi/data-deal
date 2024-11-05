@@ -44,6 +44,10 @@ class ClickHose:
     def insert(self, sql: str):
         return self.__ck.execute(sql)
 
+    def insert_dataframe(self, sql: str, df: pd.DataFrame, external_tables=None, query_id=None,
+            settings=None):
+        return self.__ck.insert_dataframe(sql, df, external_tables, query_id, settings)
+
     def close(self):
         self.__ck.disconnect()
         logger.info("ck close")
